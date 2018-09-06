@@ -35,7 +35,7 @@ namespace openssl
 class OpenSSLLibMockInterface
 {
 public:
-    virtual int SSL_EVP_MD_CTX_cleanup(EVP_MD_CTX* ctx) = 0;
+    virtual int SSL_EVP_MD_CTX_reset(EVP_MD_CTX* ctx) = 0;
     virtual int SSL_EVP_DigestFinal_ex(EVP_MD_CTX* ctx, unsigned char* md, unsigned int* s) = 0;
     virtual int SSL_EVP_DigestUpdate(EVP_MD_CTX* ctx, const void* d, size_t cnt) = 0;
     virtual int SSL_EVP_DigestInit_ex(EVP_MD_CTX* ctx, const EVP_MD* type, ENGINE* impl) = 0;
@@ -51,8 +51,8 @@ public:
     virtual X509_CRL* SSL_d2i_X509_CRL_bio(BIO* bp, X509_CRL** crl) = 0;
     virtual int SSL_PEM_write_bio_X509_CRL(BIO* bp, X509_CRL* x) = 0;
     virtual X509_CRL* SSL_PEM_read_bio_X509_CRL(BIO* bp, X509_CRL** x, pem_password_cb* cb, void* u) = 0;
-    virtual ASN1_TIME* SSL_X509_CRL_get_lastUpdate(const X509_CRL* x) = 0;
-    virtual ASN1_TIME* SSL_X509_CRL_get_nextUpdate(const X509_CRL* x) = 0;
+    virtual const ASN1_TIME* SSL_X509_CRL_get_lastUpdate(const X509_CRL* x) = 0;
+    virtual const ASN1_TIME* SSL_X509_CRL_get_nextUpdate(const X509_CRL* x) = 0;
     virtual int SSL_X509_CRL_verify(X509_CRL* a, EVP_PKEY* r) = 0;
     virtual X509_NAME* SSL_X509_CRL_get_issuer(const X509_CRL* crl) = 0;
     virtual ASN1_STRING* SSL_ASN1_STRING_dup(const ASN1_STRING* str) = 0;
@@ -62,7 +62,6 @@ public:
     virtual int SSL_BN_bn2bin(const BIGNUM* a, unsigned char* to) = 0;
     virtual ASN1_INTEGER* SSL_ASN1_INTEGER_new() = 0;
     virtual void SSL_ASN1_INTEGER_free(ASN1_INTEGER* a) = 0;
-    virtual void* SSL_OPENSSL_malloc(int num) = 0;
     virtual void SSL_OPENSSL_free(void* addr) = 0;
     virtual char* SSL_BN_bn2dec(const BIGNUM* a) = 0;
     virtual void SSL_BN_free(BIGNUM* a) = 0;
@@ -113,9 +112,6 @@ public:
     virtual int SSL_EC_GROUP_get_curve_name(const EC_GROUP *group) = 0;
     virtual int SSL_EVP_PKEY_type(int type) = 0;
     virtual int SSL_EVP_PKEY_size(EVP_PKEY *pkey) = 0;
-
-    /* Reference counting magic */
-    virtual int SSL_CRYPTO_add(int *pointer, int amount, int type) = 0;
 
     /* Error handling */
     virtual char* SSL_ERR_error_string(unsigned long error, char* buf) = 0;
@@ -173,9 +169,9 @@ public:
     virtual ASN1_TIME *SSL_ASN1_TIME_set(ASN1_TIME *s, time_t t) = 0;
 
     /* BIO Stuff */
-    virtual BIO_METHOD* SSL_BIO_s_mem() = 0;
+    virtual const BIO_METHOD* SSL_BIO_s_mem() = 0;
     virtual void SSL_BIO_free_all(BIO* ptr) = 0;
-    virtual BIO* SSL_BIO_new(BIO_METHOD* method) = 0;
+    virtual BIO* SSL_BIO_new(const BIO_METHOD* method) = 0;
     virtual int SSL_BIO_gets(BIO* bio, char* bug, int size) = 0;
     virtual int SSL_BIO_puts(BIO* bio, char* buf) = 0;
     virtual int SSL_PEM_write_bio_X509_REQ(BIO* bio, X509_REQ* req) = 0;
@@ -275,7 +271,7 @@ public:
 class OpenSSLLibMock : public OpenSSLLibMockInterface
 {
 public:
-    MOCK_METHOD1(SSL_EVP_MD_CTX_cleanup, int(EVP_MD_CTX*));
+    MOCK_METHOD1(SSL_EVP_MD_CTX_reset, int(EVP_MD_CTX*));
     MOCK_METHOD3(SSL_EVP_DigestFinal_ex, int(EVP_MD_CTX*, unsigned char*, unsigned int*));
     MOCK_METHOD3(SSL_EVP_DigestUpdate, int(EVP_MD_CTX*, const void*, size_t));
     MOCK_METHOD3(SSL_EVP_DigestInit_ex, int(EVP_MD_CTX*, const EVP_MD*, ENGINE*));
@@ -294,8 +290,8 @@ public:
     MOCK_METHOD2(SSL_PEM_write_bio_X509_CRL, int(BIO*, X509_CRL*));
     MOCK_METHOD4(SSL_PEM_read_bio_X509_CRL, X509_CRL*(BIO*, X509_CRL**, pem_password_cb*, void*));
     MOCK_METHOD1(SSL_X509_CRL_get_REVOKED, STACK_OF(X509_REVOKED)*(X509_CRL*));
-    MOCK_METHOD1(SSL_X509_CRL_get_lastUpdate, ASN1_TIME*(const X509_CRL*));
-    MOCK_METHOD1(SSL_X509_CRL_get_nextUpdate, ASN1_TIME*(const X509_CRL*));
+    MOCK_METHOD1(SSL_X509_CRL_get_lastUpdate, const ASN1_TIME*(const X509_CRL*));
+    MOCK_METHOD1(SSL_X509_CRL_get_nextUpdate, const ASN1_TIME*(const X509_CRL*));
     MOCK_METHOD2(SSL_X509_CRL_verify, int(X509_CRL*, EVP_PKEY*));
     MOCK_METHOD1(SSL_X509_CRL_get_issuer, X509_NAME*(const X509_CRL*));
     MOCK_METHOD1(SSL_ASN1_STRING_dup, ASN1_STRING*(const ASN1_STRING*));
@@ -360,7 +356,6 @@ public:
     MOCK_METHOD1(SSL_EVP_PKEY_type, int(int type));
     MOCK_METHOD1(SSL_EVP_PKEY_size, int(EVP_PKEY *pkey));
 
-    MOCK_METHOD3(SSL_CRYPTO_add, int(int*, int, int));
 
     MOCK_METHOD0(SSL_ERR_get_error, unsigned long());
     MOCK_METHOD2(SSL_ERR_error_string, char*(unsigned long, char*));
@@ -379,9 +374,9 @@ public:
     MOCK_METHOD2(SSL_X509_REQ_set_pubkey, int(X509_REQ* x, EVP_PKEY* pkey));
     MOCK_METHOD2(SSL_X509_REQ_set_version, int(X509_REQ*, unsigned long));
 
-    MOCK_METHOD0(SSL_BIO_s_mem, BIO_METHOD*());
+    MOCK_METHOD0(SSL_BIO_s_mem, const BIO_METHOD*());
     MOCK_METHOD1(SSL_BIO_free_all, void(BIO*));
-    MOCK_METHOD1(SSL_BIO_new, BIO*(BIO_METHOD*));
+    MOCK_METHOD1(SSL_BIO_new, BIO*(const BIO_METHOD*));
     MOCK_METHOD2(SSL_PEM_write_bio_X509_REQ, int(BIO*, X509_REQ*));
     MOCK_METHOD3(SSL_BIO_gets, int(BIO*, char*, int));
     MOCK_METHOD2(SSL_X509_REQ_sign_ctx, int(X509_REQ*, EVP_MD_CTX*));

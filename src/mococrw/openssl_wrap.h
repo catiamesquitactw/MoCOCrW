@@ -316,17 +316,6 @@ int _EVP_PKEY_type(const EVP_PKEY* key);
 int _EVP_PKEY_size(EVP_PKEY *pkey);
 
 /*
- * Thread safe modification of OpenSSL object reference counters.
- *
- * @param pointer A pointer to the reference counter
- * @param amount The value that the reference counter should be changed with.
- *               For example, 1 to increment one or -1 to decrement by one.
- * @param type  The lock type that should be used.
- * @return The new value of the reference counter
- */
-int _CRYPTO_add(int *pointer, int amount, int type);
-
-/*
  * Check if two public keys are the same. Please note that this function
  * (according to OpenSSL documentation) ONLY compares the public keys
  * in the EVP_PKEY structure.
@@ -453,12 +442,12 @@ SSL_X509_REQ_Ptr _PEM_read_bio_X509_REQ(BIO* bio);
  *
  * Presumably this points to static memory.
  */
-BIO_METHOD* _BIO_s_mem();
+const BIO_METHOD* _BIO_s_mem();
 
 /**
  * Create a new BIO instance for the given method.
  */
-SSL_BIO_Ptr _BIO_new(BIO_METHOD* method);
+SSL_BIO_Ptr _BIO_new(const BIO_METHOD* method);
 
 /**
  * Create a new file-backed BIO object
@@ -984,12 +973,12 @@ time_point _asn1TimeToTimePoint(const ASN1_TIME *time);
 /**
  * Gets the time for the next, planned update for a CRL.
  */
-ASN1_TIME* _X509_CRL_get_nextUpdate(const X509_CRL* crl);
+const ASN1_TIME* _X509_CRL_get_nextUpdate(const X509_CRL* crl);
 
 /**
  * Gets the time for the creation of a CRL.
  */
-ASN1_TIME* _X509_CRL_get_lastUpdate(const X509_CRL* crl);
+const ASN1_TIME* _X509_CRL_get_lastUpdate(const X509_CRL* crl);
 
 /**
  * Verifies the signature of a crl with a given public key.
