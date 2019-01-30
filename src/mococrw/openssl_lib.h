@@ -129,6 +129,7 @@ public:
     static const EC_GROUP *SSL_EC_KEY_get0_group(const EC_KEY *key) noexcept;
     static int SSL_EC_GROUP_get_curve_name(const EC_GROUP *group) noexcept;
     static int SSL_EVP_PKEY_type(int type) noexcept;
+    static int SSL_EVP_PKEY_id(const EVP_PKEY *pkey) noexcept;
     static int SSL_EVP_PKEY_size(EVP_PKEY *pkey) noexcept;
 
     /* Error handling */
@@ -279,6 +280,8 @@ public:
     static int SSL_EVP_PKEY_CTX_set_signature_md(EVP_PKEY_CTX *ctx, const EVP_MD *md) noexcept;
     static int SSL_EVP_PKEY_CTX_set_rsa_pss_saltlen(EVP_PKEY_CTX *ctx, int len) noexcept;
 
+    static EC_KEY *SSL_EVP_PKEY_get0_EC_KEY(EVP_PKEY *pkey) noexcept;
+
     /* Encryption */
     static int SSL_EVP_PKEY_encrypt_init(EVP_PKEY_CTX *ctx) noexcept;
     static int SSL_EVP_PKEY_encrypt(EVP_PKEY_CTX *ctx,
@@ -296,6 +299,9 @@ public:
     static int SSL_EVP_MD_size(const EVP_MD *md) noexcept;
     static int SSL_EVP_PKEY_CTX_set_rsa_mgf1_md(EVP_PKEY_CTX *ctx, const EVP_MD *md) noexcept;
     static int SSL_EVP_PKEY_CTX_set_rsa_padding(EVP_PKEY_CTX *ctx, int pad) noexcept;
+
+
+
 };
 }  //::lib
 }  //::openssl

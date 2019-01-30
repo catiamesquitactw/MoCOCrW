@@ -1152,5 +1152,6 @@ enum class ellipticCurveNid
     SECT_571r1 = NID_sect571r1,
 };
 
+EC_KEY *_EVP_PKEY_get0_EC_KEY(EVP_PKEY *pkey);
 }  //::openssl
 }  //::mococrw

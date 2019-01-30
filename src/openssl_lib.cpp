@@ -142,6 +142,11 @@ int OpenSSLLib::SSL_EVP_PKEY_type(int type) noexcept
     return EVP_PKEY_type(type);
 }
 
+int OpenSSLLib::SSL_EVP_PKEY_id(const EVP_PKEY *pkey) noexcept
+{
+    return EVP_PKEY_id(pkey);
+}
+
 int OpenSSLLib::SSL_EVP_PKEY_size(EVP_PKEY *pkey) noexcept
 {
     return EVP_PKEY_size(pkey);
@@ -760,6 +765,11 @@ int OpenSSLLib::SSL_EVP_PKEY_CTX_set_rsa_mgf1_md(EVP_PKEY_CTX *ctx, const EVP_MD
 {
     return EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, md);
 }
-}  //::lib
+EC_KEY *OpenSSLLib::SSL_EVP_PKEY_get0_EC_KEY(EVP_PKEY *pkey) noexcept
+{
+    return EVP_PKEY_get0_EC_KEY(pkey);
+}
+
+    }  //::lib
 }  //::openssl
 }  //::mococrw
