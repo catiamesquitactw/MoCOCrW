@@ -1121,7 +1121,7 @@ void _CRYPTO_malloc_init()
 
 EC_KEY *_EVP_PKEY_get0_EC_KEY(EVP_PKEY *pkey)
 {
-    OpensslCallPtr::callChecked(lib::OpenSSLLib::SSL_EVP_PKEY_get0_EC_KEY,pkey);
+    return OpensslCallPtr::callChecked(lib::OpenSSLLib::SSL_EVP_PKEY_get0_EC_KEY,pkey);
 }
 }  // ::openssl
 }  //:: mococrw
